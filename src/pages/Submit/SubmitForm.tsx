@@ -269,7 +269,7 @@ const SubmitForm: React.FC = () => {
           
           <img src ="/logo.png"img/>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration Form</h1>
         <p className="text-gray-600 text-lg">Geography and Environment Department - Chittagong College</p>
         
         {/* Database Connection Status */}

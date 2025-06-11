@@ -266,7 +266,8 @@ const SubmitForm: React.FC = () => {
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
           <center>  
-          <img src ="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" height="250" weight="250" img/>
+          <<img src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" height="250" width="250" />
+
    </center>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration Form</h1>
         <p className="text-gray-600 text-lg">Geography and Environment Department - Chittagong College</p>

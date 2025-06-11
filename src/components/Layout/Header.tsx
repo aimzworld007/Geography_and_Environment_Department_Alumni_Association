@@ -15,7 +15,7 @@ const Header: React.FC = () => {
             <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-200">
               <Database className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Geography Alumni</span>
+            <span className="text-xl font-bold text-gray-900">Geography Alumni Association </span>
           </Link>
 
           <nav className="flex space-x-1">

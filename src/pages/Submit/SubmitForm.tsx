@@ -265,10 +265,10 @@ const SubmitForm: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4">   </div>
-          
-          <img src ="/img/logo.png"img/>
-      
+        <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4">   
+  
+          <img src ="/img/logo.png" height="250" weight="250" img/>
+      </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration Form</h1>
         <p className="text-gray-600 text-lg">Geography and Environment Department - Chittagong College</p>
         

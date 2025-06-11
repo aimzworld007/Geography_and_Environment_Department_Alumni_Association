@@ -81,7 +81,7 @@ const PrintView: React.FC = () => {
           <div className="flex items-center justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mr-4">
               <GraduationCap className="h-8 w-8 text-white" />
-              <img src="/logo.png"/>
+              <img src="/img/logo.png"/>
             </div>
             <div className="text-left">
               <h1 className="text-2xl font-bold text-gray-900">Alumni Association Registration Form</h1>

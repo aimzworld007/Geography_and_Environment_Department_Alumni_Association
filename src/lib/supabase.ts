@@ -12,3 +12,23 @@ export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseKey || 'placeholder-key'
 );
+
+// Test database connection
+export const testConnection = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('alumni_registrations')
+      .select('count', { count: 'exact', head: true });
+    
+    if (error) {
+      console.error('Database connection error:', error);
+      return false;
+    }
+    
+    console.log('Database connected successfully');
+    return true;
+  } catch (error) {
+    console.error('Connection test failed:', error);
+    return false;
+  }
+};

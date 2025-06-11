@@ -1,4 +1,4 @@
-G# 🗺️ Geography & Environment Dept. Alumni Association  
+🗺️ Geography & Environment Dept. Alumni Association  
 ## Membership Registration & Database Management System
 
 ---
@@ -57,4 +57,17 @@ This project is a **Membership Registration and Database Management System** des
 ---
 
 ## Architecture
+
+- **Frontend**: User interface for registration, editing, and admin dashboard.  
+- **Backend API**: Handles HTTP requests, business logic, authentication.  
+- **Database**: Stores member data with structured schema.
+
+---
+
+## Installation & Setup
+
+### Clone the Repo  
+```bash
+git clone https://github.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association.git
+cd Geography_and_Environment_Department_Alumni_Association
 

@@ -84,7 +84,7 @@ const PrintView: React.FC = () => {
               <img src="/logo.jpg"/>
             </div>
             <div className="text-left">
-              <h1 className="text-2xl font-bold text-gray-900">Alumni Association Registration</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Alumni Association Registration Form</h1>
               <p className="text-gray-600">Geography and Environment Department</p>
               <p className="text-gray-600">Chittagong College, Chattogram</p>
             </div>

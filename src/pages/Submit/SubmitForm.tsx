@@ -266,7 +266,7 @@ const SubmitForm: React.FC = () => {
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
         <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4">
-          <GraduationCap className="h-10 w-10 text-white" />
+          
           <img src ="/logo.png"img/>
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration</h1>

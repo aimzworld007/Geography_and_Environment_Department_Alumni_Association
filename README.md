@@ -1,73 +1,32 @@
-🗺️ Geography & Environment Dept. Alumni Association  
-## Membership Registration & Database Management System
+# 🌍 Geography & Environment Dept. Alumni Association
+
+## 📋 Membership Registration & Database Management System
+
+This is a web-based system to manage alumni membership for the Geography and Environment Department. Alumni can register, and admins can view, edit, and export data.
 
 ---
 
-## Table of Contents
+## 🚀 Features
 
-1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Tech Stack](#tech-stack)  
-4. [Architecture](#architecture)  
-5. [Installation & Setup](#installation--setup)  
-    - [Clone the Repo](#clone-the-repo)  
-    - [Environment Setup](#environment-setup)  
-    - [Database Setup & Migration](#database-setup--migration)  
-    - [Run the Application](#run-the-application)  
-6. [Usage](#usage)  
-    - [Register Members](#register-members)  
-    - [View & Edit Members](#view--edit-members)  
-    - [Search / Reporting](#search--reporting)  
-7. [Database Schema](#database-schema)  
-8. [API Endpoints](#api-endpoints) *(if using REST)*  
-9. [Contributing](#contributing)  
-10. [License](#license)  
-11. [Contact](#contact)
+- Member registration form
+- Admin login and dashboard
+- View, edit, delete member records
+- Search and filter data
+- Export to CSV or PDF
 
 ---
 
-## Overview
+## 🛠️ Technologies Used
 
-This project is a **Membership Registration and Database Management System** designed for the Geography & Environment Department Alumni Association. It enables alumni to register themselves, and admins to securely manage member data, generate reports, and maintain communication.
-
----
-
-## Features
-
-- 🎓 Member Registration & Profile Management  
-- 🔍 Search, Filter & Export Member Lists  
-- 🔒 Admin Roles & Permission Controls  
-- 📅 Export to CSV / PDF Reports  
-- 🔔 Email Notifications & Reminders (optional)  
-- 🔧 CSV Import for Bulk Updates (optional)
+- Frontend: HTML, CSS, JavaScript (Bootstrap)
+- Backend: PHP / Python / Node.js
+- Database: MySQL or SQLite
 
 ---
 
-## Tech Stack
+## 🔧 Installation
 
-| Layer               | Technology                                |
-|---------------------|-------------------------------------------|
-| Frontend            | React / Angular / Vue / Plain HTML+JS     |
-| Backend             | Node.js (Express) / Python (Flask/Django) |
-| Database            | PostgreSQL / MySQL / SQLite               |
-| ORM                 | Sequelize / TypeORM / SQLAlchemy / Django ORM |
-| Authentication      | JWT / Passport / Devise                   |
-| Email Service       | Nodemailer / SendGrid / Mailgun (optional)|
+1. **Clone the Repository:**
 
----
-
-## Architecture
-
-- **Frontend**: User interface for registration, editing, and admin dashboard.  
-- **Backend API**: Handles HTTP requests, business logic, authentication.  
-- **Database**: Stores member data with structured schema.
-
----
-
-## Installation & Setup
-
-### Clone the Repo  
 ```bash
 git clone https://github.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association.git
-cd Geography_and_Environment_Department_Alumni_Association
-

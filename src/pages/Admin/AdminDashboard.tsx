@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap } from 'lucide-react';
+import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap, Download, Printer, Save, X, FileText, Users } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { AlumniRegistration } from '../../types/database';
 import Button from '../../components/UI/Button';
@@ -13,6 +13,9 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState<any>(null);
+  const [editingRecord, setEditingRecord] = useState<AlumniRegistration | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<AlumniRegistration>>({});
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -67,6 +70,159 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleEdit = (record: AlumniRegistration) => {
+    setEditingRecord(record);
+    setEditFormData({
+      full_name: record.full_name,
+      email_address: record.email_address,
+      mobile_number: record.mobile_number,
+      gender: record.gender,
+      blood_group: record.blood_group,
+      current_address: record.current_address,
+      permanent_address: record.permanent_address,
+      student_id: record.student_id,
+      session: record.session,
+      batch_no: record.batch_no,
+      program_degree: record.program_degree,
+      current_occupation: record.current_occupation,
+      organization_name: record.organization_name,
+      designation_position: record.designation_position,
+      work_address: record.work_address,
+      professional_email: record.professional_email,
+      interested_in_activities: record.interested_in_activities,
+      suggestions_messages: record.suggestions_messages
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editingRecord) return;
+
+    setUpdateLoading(true);
+    try {
+      const { error } = await supabase
+        .from('alumni_registrations')
+        .update({
+          ...editFormData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingRecord.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setRecords(prev => prev.map(record => 
+        record.id === editingRecord.id 
+          ? { ...record, ...editFormData, updated_at: new Date().toISOString() }
+          : record
+      ));
+
+      setEditingRecord(null);
+      setEditFormData({});
+      alert('Registration updated successfully!');
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('Failed to update registration');
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
+  const exportToCSV = () => {
+    const headers = [
+      'Serial ID', 'Full Name', 'Email', 'Mobile', 'Gender', 'Blood Group',
+      'Student ID', 'Session', 'Batch', 'Degree', 'Occupation', 'Organization',
+      'Position', 'Interested in Activities', 'Created At'
+    ];
+
+    const csvData = filteredRecords.map(record => [
+      record.serial_id,
+      record.full_name,
+      record.email_address || '',
+      record.mobile_number || '',
+      record.gender || '',
+      record.blood_group || '',
+      record.student_id || '',
+      record.session || '',
+      record.batch_no || '',
+      record.program_degree || '',
+      record.current_occupation || '',
+      record.organization_name || '',
+      record.designation_position || '',
+      record.interested_in_activities ? 'Yes' : 'No',
+      new Date(record.created_at).toLocaleDateString()
+    ]);
+
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `alumni_registrations_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const printAllRecords = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Alumni Registrations Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+            .record { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; page-break-inside: avoid; }
+            .record-header { background: #f5f5f5; padding: 10px; margin: -15px -15px 15px -15px; font-weight: bold; }
+            .field { margin: 5px 0; }
+            .field-label { font-weight: bold; display: inline-block; width: 150px; }
+            @media print { .no-print { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Alumni Association Registration Report</h1>
+            <h2>Geography and Environment Department - Chittagong College</h2>
+            <p>Generated on: ${new Date().toLocaleDateString()}</p>
+            <p>Total Records: ${filteredRecords.length}</p>
+          </div>
+          ${filteredRecords.map(record => `
+            <div class="record">
+              <div class="record-header">
+                ${record.serial_id} - ${record.full_name}
+              </div>
+              <div class="field"><span class="field-label">Email:</span> ${record.email_address || 'N/A'}</div>
+              <div class="field"><span class="field-label">Mobile:</span> ${record.mobile_number || 'N/A'}</div>
+              <div class="field"><span class="field-label">Gender:</span> ${record.gender || 'N/A'}</div>
+              <div class="field"><span class="field-label">Blood Group:</span> ${record.blood_group || 'N/A'}</div>
+              <div class="field"><span class="field-label">Student ID:</span> ${record.student_id || 'N/A'}</div>
+              <div class="field"><span class="field-label">Session:</span> ${record.session || 'N/A'}</div>
+              <div class="field"><span class="field-label">Batch:</span> ${record.batch_no || 'N/A'}</div>
+              <div class="field"><span class="field-label">Degree:</span> ${record.program_degree || 'N/A'}</div>
+              <div class="field"><span class="field-label">Occupation:</span> ${record.current_occupation || 'N/A'}</div>
+              <div class="field"><span class="field-label">Organization:</span> ${record.organization_name || 'N/A'}</div>
+              <div class="field"><span class="field-label">Position:</span> ${record.designation_position || 'N/A'}</div>
+              <div class="field"><span class="field-label">Interested in Activities:</span> ${record.interested_in_activities ? 'Yes' : 'No'}</div>
+              <div class="field"><span class="field-label">Registered:</span> ${new Date(record.created_at).toLocaleDateString()}</div>
+            </div>
+          `).join('')}
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
   const filteredRecords = records.filter(record =>
     record.serial_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     record.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,7 +233,7 @@ const AdminDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <LoadingSpinner size="lg\" text="Loading dashboard..." />
+        <LoadingSpinner size="lg" text="Loading dashboard..." />
       </div>
     );
   }
@@ -97,9 +253,55 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100">Total Registrations</p>
+              <p className="text-2xl font-bold">{records.length}</p>
+            </div>
+            <Users className="h-8 w-8 text-blue-200" />
+          </div>
+        </Card>
+        
+        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-100">Active Members</p>
+              <p className="text-2xl font-bold">{records.filter(r => r.interested_in_activities).length}</p>
+            </div>
+            <User className="h-8 w-8 text-green-200" />
+          </div>
+        </Card>
+        
+        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-100">Former Students</p>
+              <p className="text-2xl font-bold">{records.filter(r => r.registree_status === 'Former Student').length}</p>
+            </div>
+            <GraduationCap className="h-8 w-8 text-purple-200" />
+          </div>
+        </Card>
+        
+        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100">This Month</p>
+              <p className="text-2xl font-bold">
+                {records.filter(r => new Date(r.created_at).getMonth() === new Date().getMonth()).length}
+              </p>
+            </div>
+            <Calendar className="h-8 w-8 text-orange-200" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Search and Export Controls */}
       <Card className="mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="flex-1">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div className="flex-1 lg:mr-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
@@ -111,12 +313,265 @@ const AdminDashboard: React.FC = () => {
               />
             </div>
           </div>
-          <div className="text-sm text-gray-600">
-            {filteredRecords.length} of {records.length} registrations
+          
+          <div className="flex items-center space-x-3">
+            <div className="text-sm text-gray-600">
+              {filteredRecords.length} of {records.length} registrations
+            </div>
+            <Button onClick={exportToCSV} variant="success" icon={Download} size="sm">
+              Export CSV
+            </Button>
+            <Button onClick={printAllRecords} variant="secondary" icon={Printer} size="sm">
+              Print All
+            </Button>
           </div>
         </div>
       </Card>
 
+      {/* Edit Modal */}
+      {editingRecord && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Edit Registration</h2>
+                <button
+                  onClick={() => setEditingRecord(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <p className="text-gray-600 mt-1">Serial ID: {editingRecord.serial_id}</p>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={editFormData.full_name || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value={editFormData.email_address || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, email_address: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={editFormData.mobile_number || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, mobile_number: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                  <select
+                    value={editFormData.gender || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, gender: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Blood Group</label>
+                  <select
+                    value={editFormData.blood_group || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, blood_group: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+                  <input
+                    type="text"
+                    value={editFormData.student_id || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, student_id: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Session</label>
+                  <input
+                    type="text"
+                    value={editFormData.session || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, session: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Batch No</label>
+                  <input
+                    type="text"
+                    value={editFormData.batch_no || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, batch_no: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Program/Degree</label>
+                  <select
+                    value={editFormData.program_degree || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, program_degree: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Degree</option>
+                    <option value="B.Sc.">B.Sc.</option>
+                    <option value="M.Sc.">M.Sc.</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Current Occupation</label>
+                  <input
+                    type="text"
+                    value={editFormData.current_occupation || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, current_occupation: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+                  <input
+                    type="text"
+                    value={editFormData.organization_name || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, organization_name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                  <input
+                    type="text"
+                    value={editFormData.designation_position || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, designation_position: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Professional Email</label>
+                  <input
+                    type="email"
+                    value={editFormData.professional_email || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, professional_email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Current Address</label>
+                  <textarea
+                    value={editFormData.current_address || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, current_address: e.target.value }))}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Permanent Address</label>
+                  <textarea
+                    value={editFormData.permanent_address || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, permanent_address: e.target.value }))}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Work Address</label>
+                  <textarea
+                    value={editFormData.work_address || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, work_address: e.target.value }))}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Suggestions/Messages</label>
+                  <textarea
+                    value={editFormData.suggestions_messages || ''}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, suggestions_messages: e.target.value }))}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.interested_in_activities || false}
+                      onChange={(e) => setEditFormData(prev => ({ ...prev, interested_in_activities: e.target.checked }))}
+                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Interested in actively participating in alumni activities
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <Button
+                onClick={() => setEditingRecord(null)}
+                variant="secondary"
+                icon={X}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdate}
+                loading={updateLoading}
+                icon={Save}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Records List */}
       <div className="grid gap-6">
         {filteredRecords.map((record) => (
           <Card key={record.id} className="hover:bg-gray-50">
@@ -245,6 +700,14 @@ const AdminDashboard: React.FC = () => {
                 </Button>
                 <Button
                   size="sm"
+                  variant="secondary"
+                  icon={Edit}
+                  onClick={() => handleEdit(record)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
                   variant="danger"
                   icon={Trash2}
                   onClick={() => handleDelete(record.id)}
@@ -258,7 +721,9 @@ const AdminDashboard: React.FC = () => {
 
         {filteredRecords.length === 0 && (
           <Card className="text-center py-8">
-            <p className="text-gray-500">No alumni registrations found</p>
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">No alumni registrations found</p>
+            <p className="text-gray-400 text-sm">Try adjusting your search criteria</p>
           </Card>
         )}
       </div>

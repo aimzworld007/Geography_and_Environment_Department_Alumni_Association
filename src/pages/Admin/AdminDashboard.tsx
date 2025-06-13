@@ -686,32 +686,30 @@ const AdminDashboard: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
-                  {/* Photo and Basic Info */}
-                  <div className="flex items-start space-x-4">
-                    {record.photo_url && (
-                      <img
-                        src={record.photo_url}
-                        alt="Alumni"
-                        className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200"
-                      />
-                    )}
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Hash className="h-4 w-4 text-blue-600" />
-                        <span className="font-mono font-bold text-blue-700">{record.serial_id}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-green-600" />
-                        <span className="font-medium text-gray-900">{record.full_name}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(record.created_at).toLocaleDateString()}</span>
-                      </div>
+                {/* Photo and Name Column */}
+                <div className="flex flex-col items-center space-y-3 min-w-[120px]">
+                  {record.photo_url && (
+                    <img
+                      src={record.photo_url}
+                      alt="Alumni"
+                      className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
+                    />
+                  )}
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Hash className="h-3 w-3 text-blue-600" />
+                      <span className="font-mono font-bold text-blue-700 text-sm">{record.serial_id}</span>
+                    </div>
+                    <div className="font-medium text-gray-900 text-sm text-center leading-tight">
+                      {record.full_name}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {new Date(record.created_at).toLocaleDateString()}
                     </div>
                   </div>
+                </div>
 
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Contact Info */}
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 text-sm">

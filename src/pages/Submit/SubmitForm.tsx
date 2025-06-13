@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, User, Phone, Mail, MapPin, GraduationCap, Briefcase, Heart, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, User, Phone, Mail, MapPin, GraduationCap, Briefcase, Heart, CheckCircle, AlertCircle, Camera, X } from 'lucide-react';
 import { supabase, testConnection } from '../../lib/supabase';
 import { generateSerialId } from '../../utils/serialGenerator';
 import Button from '../../components/UI/Button';
@@ -78,6 +78,11 @@ const SubmitForm: React.FC = () => {
       reader.onload = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
+  };
+
+  const removePhoto = () => {
+    setPhotoPreview(null);
+    setFormData(prev => ({ ...prev, photoFile: null }));
   };
 
   const handleAreasOfInterestChange = (area: string, checked: boolean) => {
@@ -265,10 +270,9 @@ const SubmitForm: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
-          <center>  
+        <center>  
           <img src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" height="250" width="250" />
-
-   </center>
+        </center>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration Form</h1>
         <p className="text-gray-600 text-lg">Geography and Environment Department - Chittagong College</p>
         
@@ -321,6 +325,51 @@ const SubmitForm: React.FC = () => {
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Photo Upload - Moved to top */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <Camera className="h-5 w-5 mr-2 text-orange-600" />
+              Photo Upload
+            </h2>
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer overflow-hidden">
+                  {photoPreview ? (
+                    <div className="relative w-full h-full">
+                      <img 
+                        src={photoPreview} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={removePhoto}
+                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Camera className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600 font-medium">Upload Photo</p>
+                      <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+                <p className="text-center text-xs text-gray-500 mt-2">
+                  Click the box above to upload your photo
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Personal Details */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -684,43 +733,6 @@ const SubmitForm: React.FC = () => {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Photo Upload */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Upload className="h-5 w-5 mr-2 text-orange-600" />
-              Photo Upload
-            </h2>
-            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
-              {photoPreview ? (
-                <div className="space-y-3">
-                  <img src={photoPreview} alt="Preview" className="max-h-32 mx-auto rounded-lg shadow-sm" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoPreview(null);
-                      setFormData(prev => ({ ...prev, photoFile: null }));
-                    }}
-                    className="text-sm text-red-600 hover:text-red-700 transition-colors duration-200"
-                  >
-                    Remove Photo
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 mb-2">Click to upload your photo</p>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
             </div>
           </div>
 

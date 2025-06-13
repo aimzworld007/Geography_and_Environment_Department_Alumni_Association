@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap, Download, Printer, Save, X, FileText, Users } from 'lucide-react';
+import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap, Download, Printer, Save, X, FileText, Users, CheckSquare, Square } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { AlumniRegistration } from '../../types/database';
 import Button from '../../components/UI/Button';
@@ -16,6 +16,8 @@ const AdminDashboard: React.FC = () => {
   const [editingRecord, setEditingRecord] = useState<AlumniRegistration | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<AlumniRegistration>>({});
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -64,10 +66,58 @@ const AdminDashboard: React.FC = () => {
       if (error) throw error;
       
       setRecords(prev => prev.filter(record => record.id !== id));
+      setSelectedRecords(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
     } catch (error) {
       console.error('Delete error:', error);
       alert('Failed to delete registration');
     }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedRecords.size === 0) return;
+    
+    if (!confirm(`Are you sure you want to delete ${selectedRecords.size} selected registrations?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('alumni_registrations')
+        .delete()
+        .in('id', Array.from(selectedRecords));
+
+      if (error) throw error;
+      
+      setRecords(prev => prev.filter(record => !selectedRecords.has(record.id)));
+      setSelectedRecords(new Set());
+      setSelectAll(false);
+    } catch (error) {
+      console.error('Bulk delete error:', error);
+      alert('Failed to delete selected registrations');
+    }
+  };
+
+  const handleSelectRecord = (id: string) => {
+    setSelectedRecords(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedRecords(new Set());
+    } else {
+      setSelectedRecords(new Set(filteredRecords.map(record => record.id)));
+    }
+    setSelectAll(!selectAll);
   };
 
   const handleEdit = (record: AlumniRegistration) => {
@@ -167,7 +217,11 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const printAllRecords = () => {
+  const printSelectedRecords = () => {
+    const recordsToPrint = selectedRecords.size > 0 
+      ? filteredRecords.filter(record => selectedRecords.has(record.id))
+      : filteredRecords;
+
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -191,9 +245,10 @@ const AdminDashboard: React.FC = () => {
             <h1>Alumni Association Registration Report</h1>
             <h2>Geography and Environment Department - Chittagong College</h2>
             <p>Generated on: ${new Date().toLocaleDateString()}</p>
-            <p>Total Records: ${filteredRecords.length}</p>
+            <p>Total Records: ${recordsToPrint.length}</p>
+            ${selectedRecords.size > 0 ? `<p>Selected Records: ${selectedRecords.size}</p>` : ''}
           </div>
-          ${filteredRecords.map(record => `
+          ${recordsToPrint.map(record => `
             <div class="record">
               <div class="record-header">
                 ${record.serial_id} - ${record.full_name}
@@ -288,12 +343,10 @@ const AdminDashboard: React.FC = () => {
         <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100">This Month</p>
-              <p className="text-2xl font-bold">
-                {records.filter(r => new Date(r.created_at).getMonth() === new Date().getMonth()).length}
-              </p>
+              <p className="text-orange-100">Selected</p>
+              <p className="text-2xl font-bold">{selectedRecords.size}</p>
             </div>
-            <Calendar className="h-8 w-8 text-orange-200" />
+            <CheckSquare className="h-8 w-8 text-orange-200" />
           </div>
         </Card>
       </div>
@@ -318,15 +371,61 @@ const AdminDashboard: React.FC = () => {
             <div className="text-sm text-gray-600">
               {filteredRecords.length} of {records.length} registrations
             </div>
+            {selectedRecords.size > 0 && (
+              <Button onClick={handleBulkDelete} variant="danger" size="sm">
+                Delete Selected ({selectedRecords.size})
+              </Button>
+            )}
             <Button onClick={exportToCSV} variant="success" icon={Download} size="sm">
               Export CSV
             </Button>
-            <Button onClick={printAllRecords} variant="secondary" icon={Printer} size="sm">
-              Print All
+            <Button onClick={printSelectedRecords} variant="secondary" icon={Printer} size="sm">
+              {selectedRecords.size > 0 ? `Print Selected (${selectedRecords.size})` : 'Print All'}
             </Button>
           </div>
         </div>
       </Card>
+
+      {/* Bulk Selection Controls */}
+      {filteredRecords.length > 0 && (
+        <Card className="mb-6 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectAll}
+                  onChange={handleSelectAll}
+                  className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Select All ({filteredRecords.length} records)
+                </span>
+              </label>
+              {selectedRecords.size > 0 && (
+                <span className="text-sm text-blue-600 font-medium">
+                  {selectedRecords.size} selected
+                </span>
+              )}
+            </div>
+            
+            {selectedRecords.size > 0 && (
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={() => {
+                    setSelectedRecords(new Set());
+                    setSelectAll(false);
+                  }}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Clear Selection
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       {/* Edit Modal */}
       {editingRecord && (
@@ -576,116 +675,128 @@ const AdminDashboard: React.FC = () => {
         {filteredRecords.map((record) => (
           <Card key={record.id} className="hover:bg-gray-50">
             <div className="flex items-start justify-between">
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Photo and Basic Info */}
-                <div className="flex items-start space-x-4">
-                  {record.photo_url && (
-                    <img
-                      src={record.photo_url}
-                      alt="Alumni"
-                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200"
-                    />
-                  )}
+              <div className="flex items-start space-x-4">
+                {/* Selection Checkbox */}
+                <div className="flex items-center pt-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedRecords.has(record.id)}
+                    onChange={() => handleSelectRecord(record.id)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </div>
+
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+                  {/* Photo and Basic Info */}
+                  <div className="flex items-start space-x-4">
+                    {record.photo_url && (
+                      <img
+                        src={record.photo_url}
+                        alt="Alumni"
+                        className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200"
+                      />
+                    )}
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Hash className="h-4 w-4 text-blue-600" />
+                        <span className="font-mono font-bold text-blue-700">{record.serial_id}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-gray-900">{record.full_name}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(record.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Info */}
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Hash className="h-4 w-4 text-blue-600" />
-                      <span className="font-mono font-bold text-blue-700">{record.serial_id}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-green-600" />
-                      <span className="font-medium text-gray-900">{record.full_name}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(record.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Mail className="h-4 w-4 text-blue-600" />
-                    <span className="text-gray-900">{record.email_address}</span>
-                  </div>
-                  {record.mobile_number && (
                     <div className="flex items-center space-x-2 text-sm">
-                      <Phone className="h-4 w-4 text-green-600" />
-                      <span className="text-gray-900">{record.mobile_number}</span>
+                      <Mail className="h-4 w-4 text-blue-600" />
+                      <span className="text-gray-900">{record.email_address}</span>
                     </div>
-                  )}
-                  {record.gender && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Gender:</span> {record.gender}
-                    </div>
-                  )}
-                  {record.blood_group && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Blood:</span> {record.blood_group}
-                    </div>
-                  )}
-                </div>
+                    {record.mobile_number && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <Phone className="h-4 w-4 text-green-600" />
+                        <span className="text-gray-900">{record.mobile_number}</span>
+                      </div>
+                    )}
+                    {record.gender && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Gender:</span> {record.gender}
+                      </div>
+                    )}
+                    {record.blood_group && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Blood:</span> {record.blood_group}
+                      </div>
+                    )}
+                  </div>
 
-                {/* Academic Info */}
-                <div className="space-y-2">
-                  {record.student_id && (
-                    <div className="flex items-center space-x-2 text-sm">
-                      <GraduationCap className="h-4 w-4 text-purple-600" />
-                      <span className="text-gray-900">ID: {record.student_id}</span>
-                    </div>
-                  )}
-                  {record.session && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Session:</span> {record.session}
-                    </div>
-                  )}
-                  {record.batch_no && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Batch:</span> {record.batch_no}
-                    </div>
-                  )}
-                  {record.program_degree && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Degree:</span> {record.program_degree}
-                    </div>
-                  )}
-                  {record.registree_status && (
-                    <div className="text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        record.registree_status === 'Former Student' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {record.registree_status}
-                      </span>
-                    </div>
-                  )}
-                </div>
+                  {/* Academic Info */}
+                  <div className="space-y-2">
+                    {record.student_id && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <GraduationCap className="h-4 w-4 text-purple-600" />
+                        <span className="text-gray-900">ID: {record.student_id}</span>
+                      </div>
+                    )}
+                    {record.session && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Session:</span> {record.session}
+                      </div>
+                    )}
+                    {record.batch_no && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Batch:</span> {record.batch_no}
+                      </div>
+                    )}
+                    {record.program_degree && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Degree:</span> {record.program_degree}
+                      </div>
+                    )}
+                    {record.registree_status && (
+                      <div className="text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          record.registree_status === 'Former Student' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {record.registree_status}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Professional Info */}
-                <div className="space-y-2">
-                  {record.current_occupation && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Occupation:</span> {record.current_occupation}
-                    </div>
-                  )}
-                  {record.organization_name && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Organization:</span> {record.organization_name}
-                    </div>
-                  )}
-                  {record.designation_position && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">Position:</span> {record.designation_position}
-                    </div>
-                  )}
-                  {record.interested_in_activities && (
-                    <div className="text-sm">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                        Interested in Activities
-                      </span>
-                    </div>
-                  )}
+                  {/* Professional Info */}
+                  <div className="space-y-2">
+                    {record.current_occupation && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Occupation:</span> {record.current_occupation}
+                      </div>
+                    )}
+                    {record.organization_name && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Organization:</span> {record.organization_name}
+                      </div>
+                    )}
+                    {record.designation_position && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Position:</span> {record.designation_position}
+                      </div>
+                    )}
+                    {record.interested_in_activities && (
+                      <div className="text-sm">
+                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                          Interested in Activities
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -697,6 +808,19 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => navigate(`/print/${record.serial_id}`)}
                 >
                   View
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={Printer}
+                  onClick={() => {
+                    const printWindow = window.open(`/print/${record.serial_id}`, '_blank');
+                    if (printWindow) {
+                      printWindow.onload = () => printWindow.print();
+                    }
+                  }}
+                >
+                  Print
                 </Button>
                 <Button
                   size="sm"

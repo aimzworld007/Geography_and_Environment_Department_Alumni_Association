@@ -44,7 +44,7 @@ const PrintView: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <LoadingSpinner size="lg\" text="Loading record..." />
+        <LoadingSpinner size="lg" text="Loading record..." />
       </div>
     );
   }
@@ -81,7 +81,6 @@ const PrintView: React.FC = () => {
           <div className="flex items-center justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mr-4">
               <GraduationCap className="h-8 w-8 text-white" />
-              <img src="/img/logo.png"/>
             </div>
             <div className="text-left">
               <h1 className="text-2xl font-bold text-gray-900">Alumni Association Registration Form</h1>
@@ -97,20 +96,36 @@ const PrintView: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Photo Section */}
-          {record.photo_url && (
-            <div className="lg:col-span-1">
-              <div className="text-center">
-                <img
-                  src={record.photo_url}
-                  alt="Alumni Photo"
-                  className="w-48 h-48 object-cover rounded-lg border-4 border-gray-200 mx-auto"
-                />
+          <div className="lg:col-span-1">
+            <div className="text-center">
+              <div className="w-48 h-48 mx-auto rounded-lg border-4 border-gray-200 bg-gray-100 overflow-hidden flex items-center justify-center">
+                {record.photo_url ? (
+                  <img
+                    src={record.photo_url}
+                    alt="Alumni Photo"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.parentElement!.innerHTML = '<div class="text-gray-400 text-center p-4"><div class="text-sm">No Photo Available</div></div>';
+                    }}
+                  />
+                ) : (
+                  <div className="text-gray-400 text-center p-4">
+                    <User className="h-12 w-12 mx-auto mb-2" />
+                    <div className="text-sm">No Photo Available</div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 text-center">
+                <h2 className="text-xl font-bold text-gray-900">{record.full_name}</h2>
+                <p className="text-gray-600 font-mono text-lg">ID: {record.serial_id}</p>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Main Information */}
-          <div className={`${record.photo_url ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-8`}>
+          <div className="lg:col-span-2 space-y-8">
             {/* Personal Details */}
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">

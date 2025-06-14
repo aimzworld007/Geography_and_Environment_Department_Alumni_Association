@@ -233,10 +233,14 @@ const AdminDashboard: React.FC = () => {
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-            .record { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; page-break-inside: avoid; }
-            .record-header { background: #f5f5f5; padding: 10px; margin: -15px -15px 15px -15px; font-weight: bold; }
+            .record { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; page-break-inside: avoid; display: flex; gap: 20px; }
+            .record-photo { flex-shrink: 0; }
+            .record-photo img { width: 120px; height: 120px; object-fit: cover; border: 2px solid #ddd; border-radius: 8px; }
+            .record-content { flex: 1; }
+            .record-header { background: #f5f5f5; padding: 10px; margin: -20px -20px 15px 0; font-weight: bold; border-radius: 4px; }
             .field { margin: 5px 0; }
             .field-label { font-weight: bold; display: inline-block; width: 150px; }
+            .no-photo { width: 120px; height: 120px; background: #f0f0f0; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px; text-align: center; border-radius: 8px; }
             @media print { .no-print { display: none; } }
           </style>
         </head>
@@ -250,22 +254,30 @@ const AdminDashboard: React.FC = () => {
           </div>
           ${recordsToPrint.map(record => `
             <div class="record">
-              <div class="record-header">
-                ${record.serial_id} - ${record.full_name}
+              <div class="record-photo">
+                ${record.photo_url 
+                  ? `<img src="${record.photo_url}" alt="Alumni Photo" />`
+                  : `<div class="no-photo">No Photo<br>Available</div>`
+                }
               </div>
-              <div class="field"><span class="field-label">Email:</span> ${record.email_address || 'N/A'}</div>
-              <div class="field"><span class="field-label">Mobile:</span> ${record.mobile_number || 'N/A'}</div>
-              <div class="field"><span class="field-label">Gender:</span> ${record.gender || 'N/A'}</div>
-              <div class="field"><span class="field-label">Blood Group:</span> ${record.blood_group || 'N/A'}</div>
-              <div class="field"><span class="field-label">Student ID:</span> ${record.student_id || 'N/A'}</div>
-              <div class="field"><span class="field-label">Session:</span> ${record.session || 'N/A'}</div>
-              <div class="field"><span class="field-label">Batch:</span> ${record.batch_no || 'N/A'}</div>
-              <div class="field"><span class="field-label">Degree:</span> ${record.program_degree || 'N/A'}</div>
-              <div class="field"><span class="field-label">Occupation:</span> ${record.current_occupation || 'N/A'}</div>
-              <div class="field"><span class="field-label">Organization:</span> ${record.organization_name || 'N/A'}</div>
-              <div class="field"><span class="field-label">Position:</span> ${record.designation_position || 'N/A'}</div>
-              <div class="field"><span class="field-label">Interested in Activities:</span> ${record.interested_in_activities ? 'Yes' : 'No'}</div>
-              <div class="field"><span class="field-label">Registered:</span> ${new Date(record.created_at).toLocaleDateString()}</div>
+              <div class="record-content">
+                <div class="record-header">
+                  ${record.serial_id} - ${record.full_name}
+                </div>
+                <div class="field"><span class="field-label">Email:</span> ${record.email_address || 'N/A'}</div>
+                <div class="field"><span class="field-label">Mobile:</span> ${record.mobile_number || 'N/A'}</div>
+                <div class="field"><span class="field-label">Gender:</span> ${record.gender || 'N/A'}</div>
+                <div class="field"><span class="field-label">Blood Group:</span> ${record.blood_group || 'N/A'}</div>
+                <div class="field"><span class="field-label">Student ID:</span> ${record.student_id || 'N/A'}</div>
+                <div class="field"><span class="field-label">Session:</span> ${record.session || 'N/A'}</div>
+                <div class="field"><span class="field-label">Batch:</span> ${record.batch_no || 'N/A'}</div>
+                <div class="field"><span class="field-label">Degree:</span> ${record.program_degree || 'N/A'}</div>
+                <div class="field"><span class="field-label">Occupation:</span> ${record.current_occupation || 'N/A'}</div>
+                <div class="field"><span class="field-label">Organization:</span> ${record.organization_name || 'N/A'}</div>
+                <div class="field"><span class="field-label">Position:</span> ${record.designation_position || 'N/A'}</div>
+                <div class="field"><span class="field-label">Interested in Activities:</span> ${record.interested_in_activities ? 'Yes' : 'No'}</div>
+                <div class="field"><span class="field-label">Registered:</span> ${new Date(record.created_at).toLocaleDateString()}</div>
+              </div>
             </div>
           `).join('')}
         </body>
@@ -687,14 +699,23 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Photo and Name Column */}
-                <div className="flex flex-col items-center space-y-3 min-w-[120px]">
-                  {record.photo_url && (
-                    <img
-                      src={record.photo_url}
-                      alt="Alumni"
-                      className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
-                    />
-                  )}
+                <div className="flex flex-col items-center space-y-3 min-w-[140px]">
+                  <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+                    {record.photo_url ? (
+                      <img
+                        src={record.photo_url}
+                        alt="Alumni"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.parentElement!.innerHTML = '<div class="text-xs text-gray-400 text-center p-2">No Photo</div>';
+                        }}
+                      />
+                    ) : (
+                      <div className="text-xs text-gray-400 text-center p-2">No Photo</div>
+                    )}
+                  </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center space-x-1 mb-1">
                       <Hash className="h-3 w-3 text-blue-600" />

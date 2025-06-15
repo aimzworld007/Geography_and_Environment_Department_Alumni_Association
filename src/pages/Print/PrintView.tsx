@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Printer, ArrowLeft, Calendar, Hash, User, Phone, Mail, MapPin, GraduationCap, Briefcase } from 'lucide-react';
+import { Printer, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { AlumniRegistration } from '../../types/database';
 import Button from '../../components/UI/Button';
@@ -76,258 +76,306 @@ const PrintView: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="print:shadow-none print:border-none">
-        <div className="text-center mb-8 pb-6 border-b border-gray-200">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mr-4">
-              <GraduationCap className="h-8 w-8 text-white" />
+      {/* Print Form - Exact Format Match */}
+      <div className="print-form bg-white p-8 border-2 border-gray-300 print:border-black print:shadow-none">
+        {/* Header Section */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center">
+            <div className="w-20 h-20 mr-4 flex-shrink-0">
+              <img 
+                src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" 
+                alt="Department Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="text-left">
-              <h1 className="text-2xl font-bold text-gray-900">Alumni Association Registration Form</h1>
-              <p className="text-gray-600">Geography and Environment Department</p>
-              <p className="text-gray-600">Chittagong College, Chattogram</p>
-            </div>
-          </div>
-          <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-mono text-lg">
-            <Hash className="h-5 w-5 mr-2" />
-            {record.serial_id}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Photo Section */}
-          <div className="lg:col-span-1">
-            <div className="text-center">
-              <div className="w-48 h-48 mx-auto rounded-lg border-4 border-gray-200 bg-gray-100 overflow-hidden flex items-center justify-center">
-                {record.photo_url ? (
-                  <img
-                    src={record.photo_url}
-                    alt="Alumni Photo"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.parentElement!.innerHTML = '<div class="text-gray-400 text-center p-4"><div class="text-sm">No Photo Available</div></div>';
-                    }}
-                  />
-                ) : (
-                  <div className="text-gray-400 text-center p-4">
-                    <User className="h-12 w-12 mx-auto mb-2" />
-                    <div className="text-sm">No Photo Available</div>
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 text-center">
-                <h2 className="text-xl font-bold text-gray-900">{record.full_name}</h2>
-                <p className="text-gray-600 font-mono text-lg">ID: {record.serial_id}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Information */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Personal Details */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
-                <User className="h-5 w-5 mr-2 text-blue-600" />
-                Personal Details
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-500">Full Name:</span>
-                  <p className="text-gray-900 font-medium">{record.full_name}</p>
-                </div>
-                {record.date_of_birth && (
-                  <div>
-                    <span className="font-medium text-gray-500">Date of Birth:</span>
-                    <p className="text-gray-900">{new Date(record.date_of_birth).toLocaleDateString()}</p>
-                  </div>
-                )}
-                {record.gender && (
-                  <div>
-                    <span className="font-medium text-gray-500">Gender:</span>
-                    <p className="text-gray-900">{record.gender}</p>
-                  </div>
-                )}
-                {record.blood_group && (
-                  <div>
-                    <span className="font-medium text-gray-500">Blood Group:</span>
-                    <p className="text-gray-900">{record.blood_group}</p>
-                  </div>
-                )}
-                {record.mobile_number && (
-                  <div>
-                    <span className="font-medium text-gray-500">Mobile:</span>
-                    <p className="text-gray-900">{record.mobile_number}</p>
-                  </div>
-                )}
-                <div>
-                  <span className="font-medium text-gray-500">Email:</span>
-                  <p className="text-gray-900">{record.email_address}</p>
-                </div>
-                {record.emergency_contact && (
-                  <div>
-                    <span className="font-medium text-gray-500">Emergency Contact:</span>
-                    <p className="text-gray-900">{record.emergency_contact} ({record.emergency_relation})</p>
-                  </div>
-                )}
-              </div>
-              
-              {(record.current_address || record.permanent_address) && (
-                <div className="mt-4 space-y-3">
-                  {record.current_address && (
-                    <div>
-                      <span className="font-medium text-gray-500">Current Address:</span>
-                      <p className="text-gray-900 text-sm">{record.current_address}</p>
-                    </div>
-                  )}
-                  {record.permanent_address && (
-                    <div>
-                      <span className="font-medium text-gray-500">Permanent Address:</span>
-                      <p className="text-gray-900 text-sm">{record.permanent_address}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+              <h1 className="text-2xl font-bold text-blue-600 mb-1">Alumni Association of Geography and Environment</h1>
+              <h2 className="text-xl font-semibold text-black mb-1">Chittagong College, Chattogram</h2>
+              <p className="text-sm text-black">Email: geoenvironment.alumni@gmail.com</p>
+              <p className="text-sm text-black">ESTD: 5th May 2025</p>
             </div>
+          </div>
+          <div className="w-32 h-40 border-2 border-blue-400 flex items-center justify-center bg-blue-50 flex-shrink-0">
+            {record.photo_url ? (
+              <img
+                src={record.photo_url}
+                alt="Alumni Photo"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = '<div class="text-blue-600 text-center text-sm p-2">[Photo]</div>';
+                }}
+              />
+            ) : (
+              <div className="text-blue-600 text-center text-sm">[Photo]</div>
+            )}
+          </div>
+        </div>
 
-            {/* Academic Background */}
+        {/* Form Number and Title */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">Form No: {record.serial_id}</span>
+          </div>
+          <div className="text-center">
+            <div className="inline-block bg-purple-600 text-white px-6 py-2 rounded-full">
+              <span className="font-semibold">Membership Registration Form</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Personal Details Section */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold text-red-600 mb-3 underline">Personal Details</h3>
+          
+          <div className="space-y-2 text-sm">
+            <div className="flex">
+              <span className="w-32 font-medium">Full Name</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">{record.full_name}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Date of Birth</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">
+                {record.date_of_birth ? new Date(record.date_of_birth).toLocaleDateString() : '........../........../......................'}
+              </span>
+            </div>
+            
+            <div className="flex items-center">
+              <span className="w-32 font-medium">Gender</span>
+              <span className="mr-2">:</span>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.gender === 'Male'} readOnly className="mr-1" />
+                  <span>Male</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.gender === 'Female'} readOnly className="mr-1" />
+                  <span>Female</span>
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Mobile Number</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">{record.mobile_number || '........................................................................................................................................................'}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Email Address</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1">{record.email_address}</span>
+              <span className="font-medium">Blood Group:</span>
+              <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-20">{record.blood_group || '.............................'}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Emergency Contact</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1">{record.emergency_contact || '...........................................................................'}</span>
+              <span className="font-medium">(Relation):</span>
+              <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-24">{record.emergency_relation || '................................'}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Current Address</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">{record.current_address || '........................................................................................................................................................'}</span>
+            </div>
+            <div className="ml-36 border-b border-dotted border-gray-400 pb-1 text-transparent">.</div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Permanent Address</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">{record.permanent_address || '........................................................................................................................................................'}</span>
+            </div>
+            <div className="ml-36 border-b border-dotted border-gray-400 pb-1 text-transparent">.</div>
+          </div>
+        </div>
+
+        {/* Registree Status */}
+        <div className="mb-6">
+          <div className="flex items-center">
+            <span className="font-bold text-blue-600 underline mr-4">Registree Status</span>
+            <span className="mr-2">:</span>
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center">
+                <input type="checkbox" checked={record.registree_status === 'Former Student'} readOnly className="mr-1" />
+                <span>Former Student</span>
+              </label>
+              <label className="flex items-center">
+                <input type="checkbox" checked={record.registree_status === 'Current Student'} readOnly className="mr-1" />
+                <span>Current Student</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Academic Background */}
+        <div className="mb-6">
+          <h3 className="font-bold text-blue-600 underline mb-3">Academic Background:</h3>
+          
+          <div className="space-y-2 text-sm">
+            <div className="flex">
+              <span className="w-32 font-medium">Student ID (if available)</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1">{record.student_id || '........................................................................................................................................................'}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Session</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1">{record.session || '.....................................................................'}</span>
+              <span className="font-medium">Batch No.:</span>
+              <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-32">{record.batch_no || '................................................................'}</span>
+            </div>
+            
+            <div className="flex items-center">
+              <span className="w-32 font-medium">Program/Degree Completed:</span>
+              <div className="flex items-center space-x-4 ml-2">
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.program_degree === 'B.Sc.'} readOnly className="mr-1" />
+                  <span>B.Sc.</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.program_degree === 'M.Sc.'} readOnly className="mr-1" />
+                  <span>M.Sc.</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.program_degree === 'Other'} readOnly className="mr-1" />
+                  <span>Other (please specify):</span>
+                  <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-32">
+                    {record.program_degree && !['B.Sc.', 'M.Sc.'].includes(record.program_degree) ? record.program_degree : '....................................................'}
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Professional Information */}
+        <div className="mb-6">
+          <h3 className="font-bold text-purple-600 underline mb-3">Professional Information :</h3>
+          
+          <div className="space-y-2 text-sm">
+            <div className="flex">
+              <span className="w-32 font-medium">Current Occupation</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1">{record.current_occupation || '........................................,'}</span>
+              <span className="font-medium">Organization/Company Name:</span>
+              <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-40">{record.organization_name || '............................................................'}</span>
+            </div>
+            <div className="ml-36 border-b border-dotted border-gray-400 pb-1 text-transparent">.</div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Designation/Position</span>
+              <span className="mr-2">:</span>
+              <span className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1">{record.designation_position || '..........................................'}</span>
+              <span className="font-medium">Work Address:</span>
+              <span className="ml-2 border-b border-dotted border-gray-400 pb-1 w-40">{record.work_address || '......................................................................................'}</span>
+            </div>
+            
+            <div className="flex">
+              <span className="w-32 font-medium">Professional Email (if different):</span>
+              <span className="flex-1 border-b border-dotted border-gray-400 pb-1 ml-2">{record.professional_email || '.............................................................................................................................................'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Engagement with Association */}
+        <div className="mb-6">
+          <h3 className="font-bold text-green-600 underline mb-3">Engagement with the Association</h3>
+          
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center">
+              <span className="font-medium">Are you interested in actively participating in alumni activities?</span>
+              <div className="flex items-center space-x-4 ml-4">
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.interested_in_activities === true} readOnly className="mr-1" />
+                  <span>Yes</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.interested_in_activities === false} readOnly className="mr-1" />
+                  <span>No</span>
+                </label>
+              </div>
+            </div>
+            
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
-                <GraduationCap className="h-5 w-5 mr-2 text-green-600" />
-                Academic Background
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                {record.registree_status && (
-                  <div>
-                    <span className="font-medium text-gray-500">Status:</span>
-                    <p className="text-gray-900">{record.registree_status}</p>
-                  </div>
-                )}
-                {record.student_id && (
-                  <div>
-                    <span className="font-medium text-gray-500">Student ID:</span>
-                    <p className="text-gray-900">{record.student_id}</p>
-                  </div>
-                )}
-                {record.session && (
-                  <div>
-                    <span className="font-medium text-gray-500">Session:</span>
-                    <p className="text-gray-900">{record.session}</p>
-                  </div>
-                )}
-                {record.batch_no && (
-                  <div>
-                    <span className="font-medium text-gray-500">Batch No:</span>
-                    <p className="text-gray-900">{record.batch_no}</p>
-                  </div>
-                )}
-                {record.program_degree && (
-                  <div>
-                    <span className="font-medium text-gray-500">Program/Degree:</span>
-                    <p className="text-gray-900">{record.program_degree}</p>
-                  </div>
-                )}
+              <span className="font-medium">Areas of Interest (please select all that apply):</span>
+              <div className="mt-2 space-y-1">
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Mentorship Programs')} readOnly className="mr-2" />
+                  <span>Mentorship Programs</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Event Planning and Coordination')} readOnly className="mr-2" />
+                  <span>Event Planning and Coordination</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Career Development Support')} readOnly className="mr-2" />
+                  <span>Career Development Support</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Research Collaboration')} readOnly className="mr-2" />
+                  <span>Research Collaboration</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Fundraising Initiatives')} readOnly className="mr-2" />
+                  <span>Fundraising Initiatives</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" checked={record.areas_of_interest?.includes('Other')} readOnly className="mr-2" />
+                  <span>Other (please specify)</span>
+                </label>
               </div>
             </div>
-
-            {/* Professional Information */}
-            {(record.current_occupation || record.organization_name || record.designation_position) && (
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
-                  <Briefcase className="h-5 w-5 mr-2 text-purple-600" />
-                  Professional Information
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  {record.current_occupation && (
-                    <div>
-                      <span className="font-medium text-gray-500">Occupation:</span>
-                      <p className="text-gray-900">{record.current_occupation}</p>
-                    </div>
-                  )}
-                  {record.organization_name && (
-                    <div>
-                      <span className="font-medium text-gray-500">Organization:</span>
-                      <p className="text-gray-900">{record.organization_name}</p>
-                    </div>
-                  )}
-                  {record.designation_position && (
-                    <div>
-                      <span className="font-medium text-gray-500">Position:</span>
-                      <p className="text-gray-900">{record.designation_position}</p>
-                    </div>
-                  )}
-                  {record.professional_email && (
-                    <div>
-                      <span className="font-medium text-gray-500">Professional Email:</span>
-                      <p className="text-gray-900">{record.professional_email}</p>
-                    </div>
-                  )}
-                </div>
-                {record.work_address && (
-                  <div className="mt-3">
-                    <span className="font-medium text-gray-500">Work Address:</span>
-                    <p className="text-gray-900 text-sm">{record.work_address}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Engagement Information */}
-            {(record.interested_in_activities || record.areas_of_interest?.length) && (
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
-                  <User className="h-5 w-5 mr-2 text-red-600" />
-                  Association Engagement
-                </h2>
-                <div className="text-sm">
-                  <div className="mb-3">
-                    <span className="font-medium text-gray-500">Interested in Activities:</span>
-                    <p className="text-gray-900">{record.interested_in_activities ? 'Yes' : 'No'}</p>
-                  </div>
-                  {record.areas_of_interest && record.areas_of_interest.length > 0 && (
-                    <div>
-                      <span className="font-medium text-gray-500">Areas of Interest:</span>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {record.areas_of_interest.map((area, index) => (
-                          <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                            {area}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Additional Information */}
-            {record.suggestions_messages && (
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
-                  Additional Information
-                </h2>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-900 text-sm whitespace-pre-wrap">{record.suggestions_messages}</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 mr-1" />
-              <span>Registered: {new Date(record.created_at).toLocaleDateString()}</span>
-            </div>
-            <div className="flex items-center">
-              <Hash className="h-4 w-4 mr-1" />
-              <span>ID: {record.serial_id}</span>
+        {/* Additional Information */}
+        <div className="mb-6">
+          <h3 className="font-bold text-purple-600 underline mb-3">Additional Information</h3>
+          <div className="text-sm">
+            <span className="font-medium">Any Suggestions or Messages for the Association:</span>
+            <div className="mt-2 space-y-1">
+              <div className="border-b border-dotted border-gray-400 pb-1 min-h-[20px]">
+                {record.suggestions_messages ? record.suggestions_messages.substring(0, 100) : '................................................................................................................................................................................'}
+              </div>
+              <div className="border-b border-dotted border-gray-400 pb-1 min-h-[20px]">
+                {record.suggestions_messages && record.suggestions_messages.length > 100 ? record.suggestions_messages.substring(100, 200) : '................................................................................................................................................................................................'}
+              </div>
+              <div className="border-b border-dotted border-gray-400 pb-1 min-h-[20px]">
+                {record.suggestions_messages && record.suggestions_messages.length > 200 ? record.suggestions_messages.substring(200) : '................................................................................................................................................................................................'}
+              </div>
             </div>
           </div>
         </div>
-      </Card>
+
+        {/* Declaration */}
+        <div className="mb-8">
+          <h3 className="font-bold text-blue-600 underline mb-3">Declaration</h3>
+          <p className="text-sm mb-4">
+            I hereby confirm that the information provided above is true and correct to the best of my knowledge. I agree to be contacted for alumni association activities and communications.
+          </p>
+          <div className="flex justify-between items-end">
+            <div>
+              <span className="font-medium">Signature: </span>
+              <span className="border-b border-black w-40 inline-block ml-2">_________________</span>
+            </div>
+            <div>
+              <span className="font-medium">Date: </span>
+              <span className="border-b border-dotted border-gray-400 pb-1">
+                {new Date(record.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <style jsx>{`
         @media print {
@@ -336,6 +384,12 @@ const PrintView: React.FC = () => {
           }
           body {
             background: white !important;
+          }
+          .print-form {
+            border: 2px solid black !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
           }
         }
       `}</style>

@@ -777,7 +777,7 @@ const SubmitForm: React.FC = () => {
             <div className="flex justify-between items-end">
               <div>
                 <span className="font-medium">Signature: </span>
-                <span className="border-b border-black w-40 inline-block ml-2">________</span>
+                <span className="border-b border-black w-40 inline-block ml-2"> </span>
               </div>
               <div>
                 <span className="font-medium">Date: </span>

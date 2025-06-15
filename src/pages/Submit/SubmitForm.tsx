@@ -269,37 +269,29 @@ const SubmitForm: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <center>  
-          <img src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" height="250" width="250" />
-        </center>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Alumni Association Registration Form</h1>
-        <p className="text-gray-600 text-lg">Geography and Environment Department - Chittagong College</p>
-        
-        {/* Database Connection Status */}
-        <div className="mt-4 flex items-center justify-center space-x-2">
-          {dbConnected === null ? (
-            <div className="flex items-center text-gray-500">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
-              <span className="text-sm">Checking database connection...</span>
-            </div>
-          ) : dbConnected ? (
-            <div className="flex items-center text-green-600">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              <span className="text-sm">Database connected</span>
-            </div>
-          ) : (
-            <div className="flex items-center text-red-600">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <span className="text-sm">Database connection failed</span>
-            </div>
-          )}
-        </div>
+      {/* Database Connection Status */}
+      <div className="no-print mb-6 flex items-center justify-center space-x-2">
+        {dbConnected === null ? (
+          <div className="flex items-center text-gray-500">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
+            <span className="text-sm">Checking database connection...</span>
+          </div>
+        ) : dbConnected ? (
+          <div className="flex items-center text-green-600">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            <span className="text-sm">Database connected</span>
+          </div>
+        ) : (
+          <div className="flex items-center text-red-600">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <span className="text-sm">Database connection failed</span>
+          </div>
+        )}
       </div>
 
       {/* Success Message */}
       {submitStatus === 'success' && (
-        <Card className="mb-6 bg-green-50 border-green-200">
+        <Card className="no-print mb-6 bg-green-50 border-green-200">
           <div className="flex items-center space-x-3">
             <CheckCircle className="h-6 w-6 text-green-600" />
             <div>
@@ -312,7 +304,7 @@ const SubmitForm: React.FC = () => {
 
       {/* Error Message */}
       {submitStatus === 'error' && errorMessage && (
-        <Card className="mb-6 bg-red-50 border-red-200">
+        <Card className="no-print mb-6 bg-red-50 border-red-200">
           <div className="flex items-center space-x-3">
             <AlertCircle className="h-6 w-6 text-red-600" />
             <div>
@@ -323,145 +315,159 @@ const SubmitForm: React.FC = () => {
         </Card>
       )}
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Photo Upload - Moved to top */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Camera className="h-5 w-5 mr-2 text-orange-600" />
-              Photo Upload
-            </h2>
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer overflow-hidden">
-                  {photoPreview ? (
-                    <div className="relative w-full h-full">
-                      <img 
-                        src={photoPreview} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={removePhoto}
-                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <Camera className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600 font-medium">Upload Photo</p>
-                      <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-                <p className="text-center text-xs text-gray-500 mt-2">
-                  Click the box above to upload your photo
-                </p>
-              </div>
+      {/* Form - Exact Format Match */}
+      <div className="form-container bg-white p-8 border-2 border-gray-300">
+        {/* Header Section */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center">
+            <div className="w-20 h-20 mr-4 flex-shrink-0">
+              <img 
+                src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" 
+                alt="Department Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-blue-600 mb-1">Alumni Association of Geography and Environment</h1>
+              <h2 className="text-xl font-semibold text-black mb-1">Chittagong College, Chattogram</h2>
+              <p className="text-sm text-black">Email: geoenvironment.alumni@gmail.com</p>
+              <p className="text-sm text-black">ESTD: 5th May 2025</p>
             </div>
           </div>
+          <div className="w-32 h-40 border-2 border-blue-400 flex items-center justify-center bg-blue-50 flex-shrink-0 relative cursor-pointer hover:bg-blue-100 transition-colors">
+            {photoPreview ? (
+              <div className="relative w-full h-full">
+                <img 
+                  src={photoPreview} 
+                  alt="Preview" 
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={removePhoto}
+                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <div className="text-blue-600 text-center text-sm p-2">
+                <Camera className="h-8 w-8 mx-auto mb-1" />
+                [Photo]
+                <br />
+                <span className="text-xs">Click to upload</span>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </div>
+        </div>
 
-          {/* Personal Details */}
+        {/* Form Number and Title */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">Form No:</span>
+          </div>
+          <div className="text-center">
+            <div className="inline-block bg-purple-600 text-white px-6 py-2 rounded-full">
+              <span className="font-semibold">Membership Registration Form</span>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Personal Details Section */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <User className="h-5 w-5 mr-2 text-blue-600" />
-              Personal Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
+            <h3 className="text-lg font-bold text-red-600 mb-3 underline">Personal Details</h3>
+            
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Full Name</span>
+                <span className="mr-2">:</span>
                 <input
                   type="text"
                   required
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your full name"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Date of Birth</span>
+                <span className="mr-2">:</span>
                 <input
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                <div className="flex space-x-4 mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Gender</span>
+                <span className="mr-2">:</span>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="gender" 
                       value="Male"
                       checked={formData.gender === 'Male'}
                       onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                      className="mr-1" 
                     />
-                    Male
+                    <span>Male</span>
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="gender" 
                       value="Female"
                       checked={formData.gender === 'Female'}
                       onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                      className="mr-1" 
                     />
-                    Female
+                    <span>Female</span>
                   </label>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Mobile Number</span>
+                <span className="mr-2">:</span>
                 <input
                   type="tel"
                   value={formData.mobileNumber}
                   onChange={(e) => setFormData(prev => ({ ...prev, mobileNumber: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your mobile number"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Email Address</span>
+                <span className="mr-2">:</span>
                 <input
                   type="email"
                   required
                   value={formData.emailAddress}
                   onChange={(e) => setFormData(prev => ({ ...prev, emailAddress: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your email address"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Blood Group</label>
+                <span className="font-medium">Blood Group:</span>
                 <select
                   value={formData.bloodGroup}
                   onChange={(e) => setFormData(prev => ({ ...prev, bloodGroup: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-20"
                 >
-                  <option value="">Select Blood Group</option>
+                  <option value="">Select</option>
                   <option value="A+">A+</option>
                   <option value="A-">A-</option>
                   <option value="B+">B+</option>
@@ -472,156 +478,163 @@ const SubmitForm: React.FC = () => {
                   <option value="O-">O-</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Emergency Contact</span>
+                <span className="mr-2">:</span>
                 <input
                   type="tel"
                   value={formData.emergencyContact}
                   onChange={(e) => setFormData(prev => ({ ...prev, emergencyContact: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Emergency contact number"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Relation</label>
+                <span className="font-medium">(Relation):</span>
                 <input
                   type="text"
                   value={formData.emergencyRelation}
                   onChange={(e) => setFormData(prev => ({ ...prev, emergencyRelation: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  placeholder="e.g., Father, Mother, Spouse"
+                  className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-24"
+                  placeholder="Relation"
                 />
               </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Current Address</label>
+              
+              <div className="flex items-start">
+                <span className="w-32 font-medium pt-1">Current Address</span>
+                <span className="mr-2 pt-1">:</span>
                 <textarea
                   value={formData.currentAddress}
                   onChange={(e) => setFormData(prev => ({ ...prev, currentAddress: e.target.value }))}
-                  rows={3}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  rows={2}
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 resize-none"
                   placeholder="Enter your current address"
                 />
               </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Permanent Address</label>
+              
+              <div className="flex items-start">
+                <span className="w-32 font-medium pt-1">Permanent Address</span>
+                <span className="mr-2 pt-1">:</span>
                 <textarea
                   value={formData.permanentAddress}
                   onChange={(e) => setFormData(prev => ({ ...prev, permanentAddress: e.target.value }))}
-                  rows={3}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  rows={2}
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 resize-none"
                   placeholder="Enter your permanent address"
                 />
               </div>
             </div>
           </div>
 
+          {/* Registree Status */}
+          <div>
+            <div className="flex items-center">
+              <span className="font-bold text-blue-600 underline mr-4">Registree Status</span>
+              <span className="mr-2">:</span>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="registreeStatus" 
+                    value="Former Student"
+                    checked={formData.registreeStatus === 'Former Student'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, registreeStatus: e.target.value }))}
+                    className="mr-1" 
+                  />
+                  <span>Former Student</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="registreeStatus" 
+                    value="Current Student"
+                    checked={formData.registreeStatus === 'Current Student'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, registreeStatus: e.target.value }))}
+                    className="mr-1" 
+                  />
+                  <span>Current Student</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
           {/* Academic Background */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <GraduationCap className="h-5 w-5 mr-2 text-green-600" />
-              Academic Background
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Registree Status</label>
-                <div className="flex space-x-4 mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="registreeStatus"
-                      value="Former Student"
-                      checked={formData.registreeStatus === 'Former Student'}
-                      onChange={(e) => setFormData(prev => ({ ...prev, registreeStatus: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
-                    />
-                    Former Student
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="registreeStatus"
-                      value="Current Student"
-                      checked={formData.registreeStatus === 'Current Student'}
-                      onChange={(e) => setFormData(prev => ({ ...prev, registreeStatus: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
-                    />
-                    Current Student
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+            <h3 className="font-bold text-blue-600 underline mb-3">Academic Background:</h3>
+            
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Student ID (if available)</span>
+                <span className="mr-2">:</span>
                 <input
                   type="text"
                   value={formData.studentId}
                   onChange={(e) => setFormData(prev => ({ ...prev, studentId: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your student ID"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Session</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Session</span>
+                <span className="mr-2">:</span>
                 <input
                   type="text"
                   value={formData.session}
                   onChange={(e) => setFormData(prev => ({ ...prev, session: e.target.value }))}
+                  className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="e.g., 2020-21"
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Batch No.</label>
+                <span className="font-medium">Batch No.:</span>
                 <input
                   type="text"
                   value={formData.batchNo}
                   onChange={(e) => setFormData(prev => ({ ...prev, batchNo: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  placeholder="Enter your batch number"
+                  className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-32"
+                  placeholder="Batch number"
                 />
               </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Program/Degree</label>
-                <div className="flex space-x-4 mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="programDegree"
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Program/Degree Completed:</span>
+                <div className="flex items-center space-x-4 ml-2">
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="programDegree" 
                       value="B.Sc."
                       checked={formData.programDegree === 'B.Sc.'}
                       onChange={(e) => setFormData(prev => ({ ...prev, programDegree: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                      className="mr-1" 
                     />
-                    B.Sc.
+                    <span>B.Sc.</span>
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="programDegree"
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="programDegree" 
                       value="M.Sc."
                       checked={formData.programDegree === 'M.Sc.'}
                       onChange={(e) => setFormData(prev => ({ ...prev, programDegree: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                      className="mr-1" 
                     />
-                    M.Sc.
+                    <span>M.Sc.</span>
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="programDegree"
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="programDegree" 
                       value="Other"
                       checked={formData.programDegree === 'Other'}
                       onChange={(e) => setFormData(prev => ({ ...prev, programDegree: e.target.value }))}
-                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                      className="mr-1" 
                     />
-                    Other
+                    <span>Other (please specify):</span>
+                    <input
+                      type="text"
+                      disabled={formData.programDegree !== 'Other'}
+                      className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-32 disabled:opacity-50"
+                      placeholder="Specify"
+                    />
                   </label>
                 </div>
               </div>
@@ -630,63 +643,57 @@ const SubmitForm: React.FC = () => {
 
           {/* Professional Information */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Briefcase className="h-5 w-5 mr-2 text-purple-600" />
-              Professional Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Current Occupation</label>
+            <h3 className="font-bold text-purple-600 underline mb-3">Professional Information :</h3>
+            
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Current Occupation</span>
+                <span className="mr-2">:</span>
                 <input
                   type="text"
                   value={formData.currentOccupation}
                   onChange={(e) => setFormData(prev => ({ ...prev, currentOccupation: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your current occupation"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Organization/Company Name</label>
+                <span className="font-medium">Organization/Company Name:</span>
                 <input
                   type="text"
                   value={formData.organizationName}
                   onChange={(e) => setFormData(prev => ({ ...prev, organizationName: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  placeholder="Enter organization name"
+                  className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-40"
+                  placeholder="Organization name"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Designation/Position</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Designation/Position</span>
+                <span className="mr-2">:</span>
                 <input
                   type="text"
                   value={formData.designationPosition}
                   onChange={(e) => setFormData(prev => ({ ...prev, designationPosition: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 mr-4 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500"
                   placeholder="Enter your designation"
                 />
+                <span className="font-medium">Work Address:</span>
+                <input
+                  type="text"
+                  value={formData.workAddress}
+                  onChange={(e) => setFormData(prev => ({ ...prev, workAddress: e.target.value }))}
+                  className="ml-2 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 w-40"
+                  placeholder="Work address"
+                />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Professional Email</label>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium">Professional Email (if different):</span>
                 <input
                   type="email"
                   value={formData.professionalEmail}
                   onChange={(e) => setFormData(prev => ({ ...prev, professionalEmail: e.target.value }))}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="flex-1 border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 ml-2"
                   placeholder="Enter professional email"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Work Address</label>
-                <textarea
-                  value={formData.workAddress}
-                  onChange={(e) => setFormData(prev => ({ ...prev, workAddress: e.target.value }))}
-                  rows={3}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  placeholder="Enter your work address"
                 />
               </div>
             </div>
@@ -694,76 +701,95 @@ const SubmitForm: React.FC = () => {
 
           {/* Engagement with Association */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Heart className="h-5 w-5 mr-2 text-red-600" />
-              Engagement with the Association
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.interestedInActivities}
-                    onChange={(e) => setFormData(prev => ({ ...prev, interestedInActivities: e.target.checked }))}
-                    className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Are you interested in actively participating in alumni activities?
-                  </span>
-                </label>
-              </div>
-
-              {formData.interestedInActivities && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Areas of Interest (select all that apply):
+            <h3 className="font-bold text-green-600 underline mb-3">Engagement with the Association</h3>
+            
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center">
+                <span className="font-medium">Are you interested in actively participating in alumni activities?</span>
+                <div className="flex items-center space-x-4 ml-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="interestedInActivities" 
+                      value="true"
+                      checked={formData.interestedInActivities === true}
+                      onChange={(e) => setFormData(prev => ({ ...prev, interestedInActivities: e.target.value === 'true' }))}
+                      className="mr-1" 
+                    />
+                    <span>Yes</span>
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {areasOfInterestOptions.map((area) => (
-                      <label key={area} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.areasOfInterest.includes(area)}
-                          onChange={(e) => handleAreasOfInterestChange(area, e.target.checked)}
-                          className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="text-sm text-gray-700">{area}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <label className="flex items-center cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="interestedInActivities" 
+                      value="false"
+                      checked={formData.interestedInActivities === false}
+                      onChange={(e) => setFormData(prev => ({ ...prev, interestedInActivities: e.target.value === 'true' }))}
+                      className="mr-1" 
+                    />
+                    <span>No</span>
+                  </label>
                 </div>
-              )}
+              </div>
+              
+              <div>
+                <span className="font-medium">Areas of Interest (please select all that apply):</span>
+                <div className="mt-2 space-y-1">
+                  {areasOfInterestOptions.map((area) => (
+                    <label key={area} className="flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.areasOfInterest.includes(area)}
+                        onChange={(e) => handleAreasOfInterestChange(area, e.target.checked)}
+                        className="mr-2" 
+                      />
+                      <span>{area}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Additional Information */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Information</h2>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Any Suggestions or Messages for the Association:
-              </label>
-              <textarea
-                value={formData.suggestionsMessages}
-                onChange={(e) => setFormData(prev => ({ ...prev, suggestionsMessages: e.target.value }))}
-                rows={4}
-                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                placeholder="Share your thoughts, suggestions, or messages..."
-              />
+            <h3 className="font-bold text-purple-600 underline mb-3">Additional Information</h3>
+            <div className="text-sm">
+              <span className="font-medium">Any Suggestions or Messages for the Association:</span>
+              <div className="mt-2">
+                <textarea
+                  value={formData.suggestionsMessages}
+                  onChange={(e) => setFormData(prev => ({ ...prev, suggestionsMessages: e.target.value }))}
+                  rows={4}
+                  className="w-full border-b border-dotted border-gray-400 pb-1 bg-transparent focus:outline-none focus:border-blue-500 resize-none"
+                  placeholder="Share your thoughts, suggestions, or messages..."
+                />
+              </div>
             </div>
           </div>
 
           {/* Declaration */}
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Declaration</h2>
-            <p className="text-sm text-gray-700 mb-4">
-              I hereby confirm that the information provided above is true and correct to the best of my knowledge. 
-              I agree to be contacted for alumni association activities and communications.
+          <div>
+            <h3 className="font-bold text-blue-600 underline mb-3">Declaration</h3>
+            <p className="text-sm mb-4">
+              I hereby confirm that the information provided above is true and correct to the best of my knowledge. I agree to be contacted for alumni association activities and communications.
             </p>
+            <div className="flex justify-between items-end">
+              <div>
+                <span className="font-medium">Signature: </span>
+                <span className="border-b border-black w-40 inline-block ml-2">_________________</span>
+              </div>
+              <div>
+                <span className="font-medium">Date: </span>
+                <span className="border-b border-dotted border-gray-400 pb-1">
+                  {new Date().toLocaleDateString()}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Submit Button */}
-          <div className="pt-4 flex space-x-4">
+          <div className="no-print pt-6 flex space-x-4">
             <Button
               type="submit"
               loading={loading}
@@ -785,7 +811,24 @@ const SubmitForm: React.FC = () => {
             </Button>
           </div>
         </form>
-      </Card>
+      </div>
+
+      <style jsx>{`
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+          body {
+            background: white !important;
+          }
+          .form-container {
+            border: 2px solid black !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

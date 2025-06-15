@@ -320,7 +320,7 @@ const SubmitForm: React.FC = () => {
         {/* Header Section */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center">
-            <div className="w-30 h-40 mr-4 flex-shrink-0">
+            <div className="w-30 h-30 mr-4 flex-shrink-0">
               <img 
                 src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" 
                 alt="Department Logo" 

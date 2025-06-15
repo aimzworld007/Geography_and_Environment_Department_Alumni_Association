@@ -329,9 +329,9 @@ const SubmitForm: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-blue-600 mb-1">Alumni Association of Geography and Environment</h1>
-              <h2 className="text-xl font-semibold text-black mb-1">Chittagong College, Chattogram</h2>
+        <center>     <h2 className="text-xl font-semibold text-black mb-1">Chittagong College, Chattogram</h2>
               <p className="text-sm text-black">Email: geoenvironment.alumni@gmail.com</p>
-              <p className="text-sm text-black">ESTD: 5th May 2025</p>
+              <p className="text-sm text-black">ESTD: 5th May 2025</p> </center> 
             </div>
           </div>
           <div className="w-32 h-40 border-2 border-blue-400 flex items-center justify-center bg-blue-50 flex-shrink-0 relative cursor-pointer hover:bg-blue-100 transition-colors">

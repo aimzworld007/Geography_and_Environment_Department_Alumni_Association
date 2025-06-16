@@ -95,20 +95,31 @@ const PrintView: React.FC = () => {
               <p className="text-sm text-black">ESTD: 5th May 2025</p>
             </div>
           </div>
-          <div className="w-32 h-40 border-2 border-blue-400 flex items-center justify-center bg-blue-50 flex-shrink-0">
+          <div className="w-32 h-40 border-2 border-blue-400 flex items-center justify-center bg-blue-50 flex-shrink-0 overflow-hidden">
             {record.photo_url ? (
               <img
                 src={record.photo_url}
                 alt="Alumni Photo"
                 className="w-full h-full object-cover"
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '100%',
+                  objectFit: 'cover'
+                }}
+                onLoad={(e) => {
+                  console.log('Photo loaded successfully');
+                }}
                 onError={(e) => {
+                  console.error('Photo failed to load:', record.photo_url);
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
-                  target.parentElement!.innerHTML = '<div class="text-blue-600 text-center text-sm p-2">[Photo]</div>';
+                  if (target.parentElement) {
+                    target.parentElement.innerHTML = '<div class="text-blue-600 text-center text-sm p-2 flex items-center justify-center h-full">[Photo Not Available]</div>';
+                  }
                 }}
               />
             ) : (
-              <div className="text-blue-600 text-center text-sm">[Photo]</div>
+              <div className="text-blue-600 text-center text-sm p-2 flex items-center justify-center h-full">[No Photo]</div>
             )}
           </div>
         </div>
@@ -390,6 +401,13 @@ const PrintView: React.FC = () => {
             box-shadow: none !important;
             margin: 0 !important;
             padding: 20px !important;
+          }
+          
+          /* Ensure photos print properly */
+          img {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
       `}</style>

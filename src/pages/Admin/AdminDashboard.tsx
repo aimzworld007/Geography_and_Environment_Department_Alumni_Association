@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap, Download, Printer, Save, X, FileText, Users, CheckSquare, Square } from 'lucide-react';
+import { LogOut, Search, Edit, Trash2, Eye, Calendar, Hash, User, Phone, Mail, GraduationCap, Download, Printer, Save, X, FileText, Users, CheckSquare, Square, Camera, Upload } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { AlumniRegistration } from '../../types/database';
 import Button from '../../components/UI/Button';
@@ -18,6 +18,9 @@ const AdminDashboard: React.FC = () => {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -120,6 +123,56 @@ const AdminDashboard: React.FC = () => {
     setSelectAll(!selectAll);
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadPhoto = async (file: File, serialId: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${serialId}_${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('photos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Photo upload error:', error);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('photos')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      return null;
+    }
+  };
+
   const handleEdit = (record: AlumniRegistration) => {
     setEditingRecord(record);
     setEditFormData({
@@ -140,8 +193,11 @@ const AdminDashboard: React.FC = () => {
       work_address: record.work_address,
       professional_email: record.professional_email,
       interested_in_activities: record.interested_in_activities,
-      suggestions_messages: record.suggestions_messages
+      suggestions_messages: record.suggestions_messages,
+      photo_url: record.photo_url
     });
+    setPhotoPreview(record.photo_url || null);
+    setPhotoFile(null);
   };
 
   const handleUpdate = async () => {
@@ -149,10 +205,23 @@ const AdminDashboard: React.FC = () => {
 
     setUpdateLoading(true);
     try {
+      let photoUrl = editFormData.photo_url;
+
+      // Upload new photo if selected
+      if (photoFile) {
+        setPhotoUploading(true);
+        const uploadedUrl = await uploadPhoto(photoFile, editingRecord.serial_id);
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+        setPhotoUploading(false);
+      }
+
       const { error } = await supabase
         .from('alumni_registrations')
         .update({
           ...editFormData,
+          photo_url: photoUrl,
           updated_at: new Date().toISOString()
         })
         .eq('id', editingRecord.id);
@@ -162,18 +231,21 @@ const AdminDashboard: React.FC = () => {
       // Update local state
       setRecords(prev => prev.map(record => 
         record.id === editingRecord.id 
-          ? { ...record, ...editFormData, updated_at: new Date().toISOString() }
+          ? { ...record, ...editFormData, photo_url: photoUrl, updated_at: new Date().toISOString() }
           : record
       ));
 
       setEditingRecord(null);
       setEditFormData({});
+      setPhotoFile(null);
+      setPhotoPreview(null);
       alert('Registration updated successfully!');
     } catch (error) {
       console.error('Update error:', error);
       alert('Failed to update registration');
     } finally {
       setUpdateLoading(false);
+      setPhotoUploading(false);
     }
   };
 
@@ -256,7 +328,7 @@ const AdminDashboard: React.FC = () => {
             <div class="record">
               <div class="record-photo">
                 ${record.photo_url 
-                  ? `<img src="${record.photo_url}" alt="Alumni Photo" />`
+                  ? `<img src="${record.photo_url}" alt="Alumni Photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\"no-photo\\">No Photo<br>Available</div>'" />`
                   : `<div class="no-photo">No Photo<br>Available</div>`
                 }
               </div>
@@ -447,7 +519,11 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Edit Registration</h2>
                 <button
-                  onClick={() => setEditingRecord(null)}
+                  onClick={() => {
+                    setEditingRecord(null);
+                    setPhotoFile(null);
+                    setPhotoPreview(null);
+                  }}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="h-6 w-6" />
@@ -457,6 +533,71 @@ const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="p-6 space-y-6">
+              {/* Photo Upload Section */}
+              <div className="flex items-start space-x-6">
+                <div className="flex-shrink-0">
+                  <div className="w-32 h-32 border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative">
+                    {photoPreview ? (
+                      <img
+                        src={photoPreview}
+                        alt="Photo Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-gray-400 text-center">
+                        <Camera className="h-8 w-8 mx-auto mb-2" />
+                        <span className="text-xs">No Photo</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 space-y-2">
+                    <label className="block">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        icon={Upload}
+                        className="w-full cursor-pointer"
+                        onClick={() => document.querySelector('input[type="file"]')?.click()}
+                      >
+                        Change Photo
+                      </Button>
+                    </label>
+                    {photoPreview && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setPhotoPreview(null);
+                          setPhotoFile(null);
+                          setEditFormData(prev => ({ ...prev, photo_url: null }));
+                        }}
+                        className="w-full"
+                      >
+                        Remove Photo
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Photo Guidelines</h3>
+                  <ul className="text-xs text-gray-600 space-y-1">
+                    <li>• Maximum file size: 10MB</li>
+                    <li>• Supported formats: JPG, PNG, GIF</li>
+                    <li>• Recommended size: 300x400 pixels</li>
+                    <li>• Clear, professional headshot preferred</li>
+                  </ul>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -664,7 +805,11 @@ const AdminDashboard: React.FC = () => {
             
             <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
               <Button
-                onClick={() => setEditingRecord(null)}
+                onClick={() => {
+                  setEditingRecord(null);
+                  setPhotoFile(null);
+                  setPhotoPreview(null);
+                }}
                 variant="secondary"
                 icon={X}
               >
@@ -672,10 +817,10 @@ const AdminDashboard: React.FC = () => {
               </Button>
               <Button
                 onClick={handleUpdate}
-                loading={updateLoading}
+                loading={updateLoading || photoUploading}
                 icon={Save}
               >
-                Save Changes
+                {photoUploading ? 'Uploading Photo...' : updateLoading ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </div>
@@ -709,11 +854,18 @@ const AdminDashboard: React.FC = () => {
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          target.parentElement!.innerHTML = '<div class="text-xs text-gray-400 text-center p-2">No Photo</div>';
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML = '<div class="text-xs text-gray-400 text-center p-2 flex items-center justify-center h-full"><div><div class="w-6 h-6 mx-auto mb-1 text-gray-300"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>No Photo</div></div>';
+                          }
                         }}
                       />
                     ) : (
-                      <div className="text-xs text-gray-400 text-center p-2">No Photo</div>
+                      <div className="text-xs text-gray-400 text-center p-2 flex items-center justify-center h-full">
+                        <div>
+                          <User className="w-6 h-6 mx-auto mb-1 text-gray-300" />
+                          No Photo
+                        </div>
+                      </div>
                     )}
                   </div>
                   <div className="text-center">

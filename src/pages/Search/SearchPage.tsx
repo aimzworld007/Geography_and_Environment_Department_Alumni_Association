@@ -118,13 +118,17 @@ const SearchPage: React.FC = () => {
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          target.parentElement!.innerHTML = '<div class="text-gray-400 text-center p-2"><div class="text-xs">No Photo</div></div>';
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML = '<div class="text-gray-400 text-center p-2 flex items-center justify-center h-full"><div><div class="w-8 h-8 mx-auto mb-1 text-gray-300"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="text-xs">No Photo</div></div></div>';
+                          }
                         }}
                       />
                     ) : (
-                      <div className="text-gray-400 text-center p-2">
-                        <User className="h-8 w-8 mx-auto mb-1" />
-                        <div className="text-xs">No Photo</div>
+                      <div className="text-gray-400 text-center p-2 flex items-center justify-center h-full">
+                        <div>
+                          <User className="h-8 w-8 mx-auto mb-1" />
+                          <div className="text-xs">No Photo</div>
+                        </div>
                       </div>
                     )}
                   </div>

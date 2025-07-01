@@ -148,7 +148,7 @@ const AdminDashboard: React.FC = () => {
   const uploadPhoto = async (file: File, serialId: string): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${serialId}_${Date.now()}.${fileExt}`;
+      const fileName = `userimage/${serialId}_${Date.now()}.${fileExt}`;
       
       const { data, error } = await supabase.storage
         .from('photos')
@@ -289,11 +289,7 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const printSelectedRecords = () => {
-    const recordsToPrint = selectedRecords.size > 0 
-      ? filteredRecords.filter(record => selectedRecords.has(record.id))
-      : filteredRecords;
-
+  const printRecord = (record: AlumniRegistration) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -301,57 +297,347 @@ const AdminDashboard: React.FC = () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Alumni Registrations Report</title>
+          <title>Alumni Registration - ${record.full_name}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-            .record { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; page-break-inside: avoid; display: flex; gap: 20px; }
-            .record-photo { flex-shrink: 0; }
-            .record-photo img { width: 120px; height: 120px; object-fit: cover; border: 2px solid #ddd; border-radius: 8px; }
-            .record-content { flex: 1; }
-            .record-header { background: #f5f5f5; padding: 10px; margin: -20px -20px 15px 0; font-weight: bold; border-radius: 4px; }
-            .field { margin: 5px 0; }
-            .field-label { font-weight: bold; display: inline-block; width: 150px; }
-            .no-photo { width: 120px; height: 120px; background: #f0f0f0; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px; text-align: center; border-radius: 8px; }
-            @media print { .no-print { display: none; } }
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 20px; 
+              background: white;
+            }
+            .print-form { 
+              max-width: 800px; 
+              margin: 0 auto; 
+              border: 2px solid black; 
+              padding: 20px; 
+            }
+            .header { 
+              display: flex; 
+              align-items: flex-start; 
+              justify-content: space-between; 
+              margin-bottom: 20px; 
+            }
+            .logo-section { 
+              display: flex; 
+              align-items: center; 
+            }
+            .logo { 
+              width: 80px; 
+              height: 80px; 
+              margin-right: 15px; 
+            }
+            .title-section h1 { 
+              color: #2563eb; 
+              font-size: 24px; 
+              margin: 0 0 5px 0; 
+              font-weight: bold; 
+            }
+            .title-section h2 { 
+              color: black; 
+              font-size: 20px; 
+              margin: 0 0 5px 0; 
+              font-weight: 600; 
+            }
+            .title-section p { 
+              color: black; 
+              font-size: 14px; 
+              margin: 2px 0; 
+            }
+            .photo-section { 
+              width: 128px; 
+              height: 160px; 
+              border: 2px solid #60a5fa; 
+              background: #eff6ff; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              overflow: hidden;
+            }
+            .photo-section img { 
+              width: 100%; 
+              height: 100%; 
+              object-fit: cover; 
+            }
+            .form-title { 
+              text-align: center; 
+              margin: 20px 0; 
+            }
+            .form-title .badge { 
+              background: #7c3aed; 
+              color: white; 
+              padding: 8px 24px; 
+              border-radius: 25px; 
+              font-weight: 600; 
+            }
+            .section { 
+              margin-bottom: 20px; 
+            }
+            .section h3 { 
+              font-weight: bold; 
+              margin-bottom: 10px; 
+              text-decoration: underline; 
+            }
+            .personal { color: #dc2626; }
+            .academic { color: #2563eb; }
+            .professional { color: #7c3aed; }
+            .engagement { color: #059669; }
+            .additional { color: #7c3aed; }
+            .declaration { color: #2563eb; }
+            .field { 
+              display: flex; 
+              align-items: center; 
+              margin: 8px 0; 
+              font-size: 14px; 
+            }
+            .field-label { 
+              width: 150px; 
+              font-weight: 500; 
+            }
+            .field-value { 
+              flex: 1; 
+              border-bottom: 1px dotted #666; 
+              padding-bottom: 2px; 
+              margin-left: 10px; 
+            }
+            .checkbox-group { 
+              display: flex; 
+              gap: 20px; 
+              margin-left: 10px; 
+            }
+            .checkbox-item { 
+              display: flex; 
+              align-items: center; 
+              gap: 5px; 
+            }
+            .signature-section { 
+              display: flex; 
+              justify-content: space-between; 
+              margin-top: 20px; 
+            }
+            .signature-line { 
+              border-bottom: 1px solid black; 
+              width: 200px; 
+              display: inline-block; 
+            }
+            @media print {
+              body { margin: 0; padding: 10px; }
+              .print-form { border: 2px solid black; }
+            }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>Alumni Association Registration Report</h1>
-            <h2>Geography and Environment Department - Chittagong College</h2>
-            <p>Generated on: ${new Date().toLocaleDateString()}</p>
-            <p>Total Records: ${recordsToPrint.length}</p>
-            ${selectedRecords.size > 0 ? `<p>Selected Records: ${selectedRecords.size}</p>` : ''}
-          </div>
-          ${recordsToPrint.map(record => `
-            <div class="record">
-              <div class="record-photo">
+          <div class="print-form">
+            <div class="header">
+              <div class="logo-section">
+                <img src="https://raw.githubusercontent.com/aimzworld007/Geography_and_Environment_Department_Alumni_Association/refs/heads/main/img/logo.png" alt="Logo" class="logo">
+                <div class="title-section">
+                  <h1>Alumni Association of Geography and Environment</h1>
+                  <h2>Chittagong College, Chattogram</h2>
+                  <p>Email: geoenvironment.alumni@gmail.com</p>
+                  <p>ESTD: 5th May 2025</p>
+                </div>
+              </div>
+              <div class="photo-section">
                 ${record.photo_url 
-                  ? `<img src="${record.photo_url}" alt="Alumni Photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\"no-photo\\">No Photo<br>Available</div>'" />`
-                  : `<div class="no-photo">No Photo<br>Available</div>`
+                  ? `<img src="${record.photo_url}" alt="Alumni Photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\"color: #2563eb; text-align: center; font-size: 12px; padding: 10px;\\">Photo Not Available</div>'" />`
+                  : '<div style="color: #2563eb; text-align: center; font-size: 12px; padding: 10px;">No Photo</div>'
                 }
               </div>
-              <div class="record-content">
-                <div class="record-header">
-                  ${record.serial_id} - ${record.full_name}
-                </div>
-                <div class="field"><span class="field-label">Email:</span> ${record.email_address || 'N/A'}</div>
-                <div class="field"><span class="field-label">Mobile:</span> ${record.mobile_number || 'N/A'}</div>
-                <div class="field"><span class="field-label">Gender:</span> ${record.gender || 'N/A'}</div>
-                <div class="field"><span class="field-label">Blood Group:</span> ${record.blood_group || 'N/A'}</div>
-                <div class="field"><span class="field-label">Student ID:</span> ${record.student_id || 'N/A'}</div>
-                <div class="field"><span class="field-label">Session:</span> ${record.session || 'N/A'}</div>
-                <div class="field"><span class="field-label">Batch:</span> ${record.batch_no || 'N/A'}</div>
-                <div class="field"><span class="field-label">Degree:</span> ${record.program_degree || 'N/A'}</div>
-                <div class="field"><span class="field-label">Occupation:</span> ${record.current_occupation || 'N/A'}</div>
-                <div class="field"><span class="field-label">Organization:</span> ${record.organization_name || 'N/A'}</div>
-                <div class="field"><span class="field-label">Position:</span> ${record.designation_position || 'N/A'}</div>
-                <div class="field"><span class="field-label">Interested in Activities:</span> ${record.interested_in_activities ? 'Yes' : 'No'}</div>
-                <div class="field"><span class="field-label">Registered:</span> ${new Date(record.created_at).toLocaleDateString()}</div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 14px; margin-bottom: 10px;">Form No: ${record.serial_id}</div>
+              <div class="form-title">
+                <span class="badge">Membership Registration Form</span>
               </div>
             </div>
-          `).join('')}
+
+            <div class="section">
+              <h3 class="personal">Personal Details</h3>
+              <div class="field">
+                <span class="field-label">Full Name</span>
+                <span>:</span>
+                <span class="field-value">${record.full_name}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Date of Birth</span>
+                <span>:</span>
+                <span class="field-value">${record.date_of_birth ? new Date(record.date_of_birth).toLocaleDateString() : ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Gender</span>
+                <span>:</span>
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.gender === 'Male' ? 'checked' : ''} disabled>
+                    <span>Male</span>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.gender === 'Female' ? 'checked' : ''} disabled>
+                    <span>Female</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <span class="field-label">Mobile Number</span>
+                <span>:</span>
+                <span class="field-value">${record.mobile_number || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Email Address</span>
+                <span>:</span>
+                <span class="field-value" style="flex: 0.6;">${record.email_address}</span>
+                <span style="margin-left: 20px; font-weight: 500;">Blood Group:</span>
+                <span class="field-value" style="flex: 0.2; margin-left: 10px;">${record.blood_group || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Emergency Contact</span>
+                <span>:</span>
+                <span class="field-value" style="flex: 0.6;">${record.emergency_contact || ''}</span>
+                <span style="margin-left: 20px; font-weight: 500;">(Relation):</span>
+                <span class="field-value" style="flex: 0.2; margin-left: 10px;">${record.emergency_relation || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Current Address</span>
+                <span>:</span>
+                <span class="field-value">${record.current_address || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Permanent Address</span>
+                <span>:</span>
+                <span class="field-value">${record.permanent_address || ''}</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="field">
+                <span style="font-weight: bold; color: #2563eb; text-decoration: underline;">Registree Status</span>
+                <span>:</span>
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.registree_status === 'Former Student' ? 'checked' : ''} disabled>
+                    <span>Former Student</span>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.registree_status === 'Current Student' ? 'checked' : ''} disabled>
+                    <span>Current Student</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3 class="academic">Academic Background:</h3>
+              <div class="field">
+                <span class="field-label">Student ID</span>
+                <span>:</span>
+                <span class="field-value">${record.student_id || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Session</span>
+                <span>:</span>
+                <span class="field-value" style="flex: 0.6;">${record.session || ''}</span>
+                <span style="margin-left: 20px; font-weight: 500;">Batch No.:</span>
+                <span class="field-value" style="flex: 0.3; margin-left: 10px;">${record.batch_no || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Program/Degree:</span>
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.program_degree === 'B.Sc.' ? 'checked' : ''} disabled>
+                    <span>B.Sc.</span>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.program_degree === 'M.Sc.' ? 'checked' : ''} disabled>
+                    <span>M.Sc.</span>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.program_degree === 'Other' ? 'checked' : ''} disabled>
+                    <span>Other: ${record.program_degree && !['B.Sc.', 'M.Sc.'].includes(record.program_degree) ? record.program_degree : ''}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3 class="professional">Professional Information:</h3>
+              <div class="field">
+                <span class="field-label">Current Occupation</span>
+                <span>:</span>
+                <span class="field-value" style="flex: 0.5;">${record.current_occupation || ''}</span>
+                <span style="margin-left: 20px; font-weight: 500;">Organization:</span>
+                <span class="field-value" style="flex: 0.4; margin-left: 10px;">${record.organization_name || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Designation/Position</span>
+                <span>:</span>
+                <span class="field-value" style="flex: 0.5;">${record.designation_position || ''}</span>
+                <span style="margin-left: 20px; font-weight: 500;">Work Address:</span>
+                <span class="field-value" style="flex: 0.4; margin-left: 10px;">${record.work_address || ''}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Professional Email</span>
+                <span>:</span>
+                <span class="field-value">${record.professional_email || ''}</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3 class="engagement">Engagement with the Association</h3>
+              <div class="field">
+                <span style="font-weight: 500;">Are you interested in actively participating in alumni activities?</span>
+                <div class="checkbox-group" style="margin-left: 20px;">
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.interested_in_activities === true ? 'checked' : ''} disabled>
+                    <span>Yes</span>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" ${record.interested_in_activities === false ? 'checked' : ''} disabled>
+                    <span>No</span>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 10px;">
+                <span style="font-weight: 500;">Areas of Interest:</span>
+                <div style="margin-top: 5px;">
+                  ${['Mentorship Programs', 'Event Planning and Coordination', 'Career Development Support', 'Research Collaboration', 'Fundraising Initiatives', 'Other'].map(area => `
+                    <div class="checkbox-item" style="margin: 3px 0;">
+                      <input type="checkbox" ${record.areas_of_interest?.includes(area) ? 'checked' : ''} disabled>
+                      <span>${area}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3 class="additional">Additional Information</h3>
+              <div style="font-weight: 500; margin-bottom: 10px;">Any Suggestions or Messages for the Association:</div>
+              <div style="border-bottom: 1px dotted #666; min-height: 60px; padding: 5px;">
+                ${record.suggestions_messages || ''}
+              </div>
+            </div>
+
+            <div class="section">
+              <h3 class="declaration">Declaration</h3>
+              <p style="font-size: 14px; margin-bottom: 20px;">
+                I hereby confirm that the information provided above is true and correct to the best of my knowledge. 
+                I agree to be contacted for alumni association activities and communications.
+              </p>
+              <div class="signature-section">
+                <div>
+                  <span style="font-weight: 500;">Signature: </span>
+                  <span class="signature-line"></span>
+                </div>
+                <div>
+                  <span style="font-weight: 500;">Date: </span>
+                  <span style="border-bottom: 1px dotted #666; padding-bottom: 2px;">
+                    ${new Date(record.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </body>
       </html>
     `;
@@ -359,7 +645,21 @@ const AdminDashboard: React.FC = () => {
     printWindow.document.write(printContent);
     printWindow.document.close();
     printWindow.focus();
-    printWindow.print();
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
+  const printSelectedRecords = () => {
+    const recordsToPrint = selectedRecords.size > 0 
+      ? filteredRecords.filter(record => selectedRecords.has(record.id))
+      : filteredRecords;
+
+    recordsToPrint.forEach((record, index) => {
+      setTimeout(() => {
+        printRecord(record);
+      }, index * 1000);
+    });
   };
 
   const filteredRecords = records.filter(record =>
@@ -984,12 +1284,7 @@ const AdminDashboard: React.FC = () => {
                   size="sm"
                   variant="secondary"
                   icon={Printer}
-                  onClick={() => {
-                    const printWindow = window.open(`/print/${record.serial_id}`, '_blank');
-                    if (printWindow) {
-                      printWindow.onload = () => printWindow.print();
-                    }
-                  }}
+                  onClick={() => printRecord(record)}
                 >
                   Print
                 </Button>

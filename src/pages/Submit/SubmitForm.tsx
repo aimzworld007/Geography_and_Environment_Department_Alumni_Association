@@ -97,7 +97,7 @@ const SubmitForm: React.FC = () => {
   const uploadPhoto = async (file: File, serialId: string): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${serialId}.${fileExt}`;
+      const fileName = `userimage/${serialId}_${Date.now()}.${fileExt}`;
       
       const { data, error } = await supabase.storage
         .from('photos')
